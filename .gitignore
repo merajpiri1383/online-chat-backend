@@ -1,0 +1,12 @@
+# media files in django 
+/media 
+
+# env for packages 
+/env 
+
+# for personal data 
+.env
+ 
+# for caching data 
+/__pycach__
+
