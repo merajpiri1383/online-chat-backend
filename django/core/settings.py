@@ -43,9 +43,11 @@ INSTALLED_APPS = [
     # internal apps
     'user.apps.UserConfig',
     'chat.apps.ChatConfig',
+    'account.apps.AccountConfig',
 
     # external apps
     'rest_framework',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +59,19 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# rest framework settings
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS" : "drf_spectacular.openapi.AutoSchema",
+}
+
+# drf spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'online-chat',
+    'DESCRIPTION': 'backend of online chat build with django rest framework',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 ROOT_URLCONF = 'core.urls'
 
