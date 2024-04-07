@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'user.apps.UserConfig',
     'chat.apps.ChatConfig',
     'authorization.apps.AuthorizationConfig',
+    'authentication.apps.AuthenticationConfig',
 
     # external apps
     'rest_framework',
