@@ -18,7 +18,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     # fields for detemaine user permissions
     is_active = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
+    is_manager = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
     # date user joined used django-jalali packages
@@ -38,7 +38,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     @property
     def is_staff(self):
-        return self.is_admin
+        return self.is_manager
 
     # change otp code every time user saved
     def save(self,**kwargs):

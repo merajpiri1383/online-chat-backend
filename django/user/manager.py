@@ -16,6 +16,6 @@ class UserManager(BaseUserManager) :
     # create superuser called when createsuperuser
     def create_superuser(self,phone,password,**kwargs):
         kwargs.setdefault("is_active",True)
-        kwargs.setdefault("is_admin",True)
+        kwargs.setdefault("is_manager",True)
         kwargs.setdefault("is_superuser",True)
         return self.create_user(phone=phone,password=password,**kwargs)

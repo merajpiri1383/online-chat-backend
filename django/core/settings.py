@@ -42,8 +42,10 @@ INSTALLED_APPS = [
 
     # internal apps
     'user.apps.UserConfig',
+    'chat.apps.ChatConfig',
 
     # external apps
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
