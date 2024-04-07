@@ -6,27 +6,27 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 # jwt authentication
 # serializers for registerations
-from authorization.serializers import PhoneSerializer,PasswordSerializer
+from account.serializers import RegisterSerialzier,ResetPassword
 # documenting
 from drf_spectacular.utils import extend_schema,OpenApiParameter
 # tasks
-from authorization.tasks import delete_user,send_sms
+from account.tasks import delete_user,send_sms,forget_password
 from celery import chain
 # jwt tokens
 from user.serializer import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-# permissions
-from authorization.permissions import IsOwnerOrNot
+
+
 # handling registeration for user
-class RegisterPhoneAPIView(APIView) :
-    serializer_class = PhoneSerializer
+class RegisterAPIView(APIView) :
+    serializer_class = RegisterSerialzier
     @extend_schema(
         parameters=[
             OpenApiParameter(name="phone", description="phone number for registeration", required=True)
         ]
     )
     def post(self,request):
-        serializer = PhoneSerializer(data=request.data)
+        serializer = RegisterSerialzier(data=request.data)
         if serializer.is_valid() :
             user = serializer.save()
             # send activation code using celery and rabbitmq
@@ -40,7 +40,7 @@ class RegisterPhoneAPIView(APIView) :
 
 
 # verify
-class VerifyPhoneAPIView(APIView) :
+class VerifyAPIView(APIView) :
     # sagger
     @extend_schema(
         parameters=[
@@ -48,8 +48,6 @@ class VerifyPhoneAPIView(APIView) :
             OpenApiParameter(name="otp",description="otp code ",required=True)
         ]
     )
-
-
     def post(self,request):
         if not request.data.get("phone") :
             return Response(data={"detail":"phone number is required"},status=status.HTTP_400_BAD_REQUEST)
@@ -71,37 +69,65 @@ class VerifyPhoneAPIView(APIView) :
         else :
             return Response(data={"detail":"invalid otp"},status=status.HTTP_400_BAD_REQUEST)
 
-# set passsword
-class SetPasswordAPIView(APIView) :
-    serializer_class = PasswordSerializer
-    permission_classes = [IsOwnerOrNot]
+# login
+class LoginAPIView(APIView) :
+    # documenting
     @extend_schema(
         parameters=[
-            OpenApiParameter(name="phone",description="phone number",required=True),
-            OpenApiParameter(name="password",description="must be between 8,16 character",required=True),
-            OpenApiParameter(name="confirm_password",required=True)
+            OpenApiParameter(name="phone",required=True),
+            OpenApiParameter(name="password",required=True)
         ]
     )
 
     def post(self,request):
-        # get user
+        # check phone and password is exist
         if not request.data.get("phone") :
-            return Response(data={"detail":"phone number is required"},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":"phone is required ."},status=status.HTTP_400_BAD_REQUEST)
+        if not request.data.get("password") :
+            return Response(data={"detail":"password is required ."},status=status.HTTP_400_BAD_REQUEST)
+
+        # check user exist
+        try :
+            user = get_user_model().objects.get(phone=request.data.get("phone"),is_active=True)
+        except :
+            return Response(data={"detail":"user doesnt exist ."},status=status.HTTP_400_BAD_REQUEST)
+        if user.check_password(request.data.get("password")) :
+            token = RefreshToken.for_user(user)
+            return Response(data={
+                "user": UserSerializer(user).data,
+                "access_token": str(token.access_token),
+                "refresh_token" : str(token),
+            })
+        else :
+            return Response(data={"detail":"password or phone is incorrect ."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+# forget password and send otp code for reseting
+class ForegetPasswordAPIView(APIView) :
+    # documenting
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name="phone",required=True)
+        ]
+    )
+    def post(self,request):
+        # check phone is passed
+        if not request.data.get("phone") :
+            return Response(data={"detail":"phone is required ."} , status=status.HTTP_400_BAD_REQUEST)
+        # send otp to user
+        forget_password.apply_async(args=[request.data.get("phone")])
+        return Response(data={"detail":"code is sent ."})
+
+class ResetPasswordAPIView(APIView) :
+    def put(self,request):
         try :
             user = get_user_model().objects.get(phone=request.data.get("phone"))
         except :
-            return Response(
-                data={"detail":"user with this phone doenst exist ."},
-                status = status.HTTP_400_BAD_REQUEST
-            )
-        self.check_object_permissions(request,user)
-        serializer = PasswordSerializer(data=request.data,instance=user)
+            return Response(data={"detail":"user with this phone does not exist ."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        serializer = ResetPassword(data=request.data,instance=user)
         if serializer.is_valid() :
-            user.set_password(request.data.get("password"))
-            user.save()
-            return Response(data={"detail":"ok"})
+            serializer.save()
+            return Response(data=UserSerializer(user).data)
         else :
-            return Response (
-                data=serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
