@@ -8,5 +8,9 @@
 .env
  
 # for caching data 
-/__pycach__
+**/__pycache__/
 
+# for database
+db.sqlite3
+
+/.idea
