@@ -1,7 +1,7 @@
 import os
 # config for .env file
 from dotenv import load_dotenv
-
+from datetime import timedelta
 load_dotenv()
 
 from pathlib import Path
@@ -89,6 +89,12 @@ TEMPLATES = [
     },
 ]
 
+# jwt authentication settings
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME" : timedelta(minutes=20),
+    "REFRESH_TOKEN_LIFETIME" : timedelta(days=2)
+}
+
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
@@ -147,3 +153,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # celery settings
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL','amqp://guest@localhost:5672/')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND','redis://localhost:6379/')
+
+# media configuration
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR /"media"
