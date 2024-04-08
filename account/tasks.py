@@ -23,6 +23,7 @@ def delete_user(phone_number) :
 @shared_task(queue="queue_1")
 def forget_password(phone):
     user = get_object_or_404(get_user_model(),phone=phone)
+    user.is_active = True
     # send sms
     sys.stdout.write(user.otp)
     sleep(120)

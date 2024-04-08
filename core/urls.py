@@ -13,5 +13,6 @@ urlpatterns = [
     path("auth/", include("account.urls")),
     path('chat/',include("chat.urls")),
     path("user/",include("user.urls")),
+    path("group/",include("group.urls")),
     re_path(r"^media/(?P<path>.*)$",serve,{"document_root":settings.MEDIA_ROOT}),
 ]
