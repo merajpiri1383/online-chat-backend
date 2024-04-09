@@ -26,5 +26,6 @@ def forget_password(phone):
     user.is_active = True
     # send sms
     sys.stdout.write(user.otp)
-    sleep(120)
+    sleep(20)
     user.save()
+    sys.stdout.write(user)

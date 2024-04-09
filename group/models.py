@@ -14,11 +14,11 @@ class Group(models.Model) :
 
 class MessageGroup(Message) :
     group = models.ForeignKey(Group,on_delete=models.CASCADE,related_name="messages")
-    create_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
-    created = jDateTimeField(auto_now_add=True)
-    updated = jDateTimeField(auto_now=True)
     sub_message = models.ForeignKey(
         "MessageGroup",
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
+    def __str__(self):
+        return f"Message Group : {self.group.name}"

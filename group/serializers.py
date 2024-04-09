@@ -6,9 +6,38 @@ from user.serializer import UserSerializer
 from django.contrib.auth import get_user_model
 
 class MessageGroupSerializer(serializers.ModelSerializer) :
+    create_by = UserSerializer(read_only=True)
     class Meta :
         model = MessageGroup
-        fields = ["group","create_by","created","updated"]
+        fields = ["id","group","create_by","text","file"]
+
+    def to_representation(self,instance):
+        context = super().to_representation(instance)
+        context["create_time"] = instance.created.strftime("%H:%M:%S")
+        context["create_date"] = instance.created.strftime("%Y-%m-%d")
+        context["update_time"] = instance.updated.strftime("%H:%M:%S")
+        context["update_date"] = instance.updated.strftime("%Y-%m-%d")
+        return context
+
+    def create(self,validated_data):
+        message = MessageGroup.objects.create(
+            create_by=self.context.get("request").user,
+            **validated_data
+        )
+        return message
+    def update(self,instance,validated_data):
+        instance.text = validated_data.get("text")
+        instance.file = validated_data.get("file")
+        instance.save()
+        return instance
+    def validate(self,validated_data):
+        user = self.context.get("request").user
+        if not validated_data.get("text") and not validated_data.get("file") :
+            raise serializers.ValidationError("text or file is required .")
+        if validated_data.get("group") :
+            if not user in validated_data.get("group").users.all() and user != validated_data.get("group").create_by:
+                raise serializers.ValidationError("this user is not in this group .")
+        return validated_data
 
 class GroupSerializer(serializers.ModelSerializer) :
     create_by = UserSerializer(read_only=True)

@@ -91,7 +91,6 @@ class LoginAPIView(APIView) :
             user = get_user_model().objects.get(phone=request.data.get("phone"),is_active=True)
         except :
             return Response(data={"detail":"user doesnt exist ."},status=status.HTTP_400_BAD_REQUEST)
-        print(user.check_password(request.data.get("password")))
         if user.check_password(request.data.get("password")) :
             token = RefreshToken.for_user(user)
             return Response(data={

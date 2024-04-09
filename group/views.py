@@ -2,14 +2,14 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView,CreateAPIView,RetrieveUpdateDestroyAPIView
 # models
 from group.models import Group,MessageGroup
 from django.contrib.auth import get_user_model
 # serializers
 from group.serializers import MessageGroupSerializer,GroupSerializer
 # permissions
-from group.permissions import IsOwnerGroupOrNot
+from group.permissions import IsOwnerGroupOrNot,IsOwnerMessageOrReadOnly,IsOwnerGroupOrInGroupReadOnly
 from rest_framework.permissions import IsAuthenticated
 
 # get all groups for a user or create one
@@ -22,7 +22,7 @@ class GroupListCreateAPIView(ListCreateAPIView) :
 
 class UserGroupAPIView(APIView) :
 
-    permission_classes = [IsAuthenticated,IsOwnerGroupOrNot]
+    permission_classes = [IsAuthenticated,IsOwnerGroupOrInGroupReadOnly]
 
     def get_user(self):
         if not self.request.data.get("phone") :
@@ -55,3 +55,20 @@ class UserGroupAPIView(APIView) :
         self.check_object_permissions(self.request, self.group)
         self.group.users.remove(self.user)
         return Response(data=GroupSerializer(self.group).data)
+
+# get update and delete group
+class GroupAPIView(RetrieveUpdateDestroyAPIView) :
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = [IsAuthenticated,IsOwnerGroupOrInGroupReadOnly]
+
+# sending message to the group
+class CreateMessageGroupAPIView(CreateAPIView) :
+    permission_classes = [IsAuthenticated]
+    serializer_class = MessageGroupSerializer
+
+# get retreive update destroy message
+class MessageGroupAPIView(RetrieveUpdateDestroyAPIView) :
+    permission_classes = [IsAuthenticated,IsOwnerMessageOrReadOnly]
+    serializer_class = MessageGroupSerializer
+    queryset = MessageGroup.objects.all()

@@ -9,22 +9,18 @@ class Chat(models.Model) :
 
     def __str__(self):
         return f"Chat  {self.create_by} "
-# class ChatGroup(models.Model) :
-#     create_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name="owner_groups")
-#     user = models.ManyToManyField(get_user_model(),related_name="chat_groups")
-#     admins = models.ManyToManyField(get_user_model())
-#     created = jDateTimeField(auto_now_add=True)
+
 
 class Message(models.Model) :
-    create_by = models.ForeignKey(get_user_model(),related_name="messages",on_delete=models.CASCADE)
+    create_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    text = models.TextField(null=True,blank=True)
+    file = models.FileField(upload_to="chat/messages/files", null=True,blank=True)
     created = jDateTimeField(auto_now_add=True)
     updated = jDateTimeField(auto_now=True)
     class Meta :
         abstract = True
 class MessageChat(Message) :
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="messages", null=True)
-    text = models.TextField(null=True)
-    file = models.FileField(upload_to="chat/messages/files",null=True)
     # if message is response of another message
     sub_message = models.ForeignKey(
         "MessageChat",
