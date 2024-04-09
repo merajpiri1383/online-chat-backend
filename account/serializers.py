@@ -12,7 +12,7 @@ class RegisterSerialzier(serializers.ModelSerializer) :
     confirm_password = serializers.SlugField(required=True,write_only=True)
     class Meta :
         model = get_user_model()
-        fields = ["phone","password","confirm_password"]
+        fields = ["id","phone","password","confirm_password"]
 
     def create(self,validated_data):
         user = get_user_model().objects.create(phone = validated_data["phone"])
