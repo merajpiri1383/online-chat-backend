@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission,SAFE_METHODS
+from django.contrib.auth import get_user_model
 
 class IsInChat(BasePermission) :
     def has_object_permission(self,request,view,obj):

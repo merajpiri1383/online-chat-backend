@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'account.apps.AccountConfig',
     'group.apps.GroupConfig',
+    'profuser.apps.ProfuserConfig',
 
     # external apps
     'rest_framework',

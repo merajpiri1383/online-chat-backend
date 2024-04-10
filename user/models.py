@@ -12,8 +12,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     # use phone instead of username field
     phone = models.SlugField(max_length=11,unique=True)
-    username = models.CharField(max_length=64,null=True,blank=True)
-    image = models.ImageField(upload_to="user/images",null=True,blank=True)
+
     # fields for detemaine user permissions
     is_active = models.BooleanField(default=False)
     is_manager = models.BooleanField(default=False)
@@ -21,7 +20,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     favorits = models.ManyToManyField("User",related_name="favorites",blank=True)
     contacts = models.ManyToManyField("User",related_name="all_contacts",blank=True)
-
+    blacklist = models.ManyToManyField("User",related_name="black_list",blank=True)
     # date user joined used django-jalali packages
     date_joined = jDateTimeField(auto_now_add=True)
     # otp code

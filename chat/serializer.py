@@ -5,18 +5,20 @@ from django.contrib.auth import get_user_model
 
 class MessageSerializer(serializers.ModelSerializer) :
     create_by = UserSerializer(read_only=True)
-    def create(self,validated_data):
-        user = self.context.get("request").user
-        chat = Chat.objects.get(id=self.context["view"].kwargs.get("pk"))
-        return MessageChat.objects.create(create_by=user,chat=chat,**validated_data)
     class Meta :
         model = MessageChat
         fields = ["id","create_by","chat","file","text"]
         required_fields = ["chat"]
-    def validate(self,validated_date):
-        if not validated_date.get("text") and not validated_date.get("file") :
+    def validate(self,attr):
+        if not attr.get("text") and not attr.get("file") :
             raise serializers.ValidationError("file or text is required .")
-        return validated_date
+        # check user is blocked or not
+        attr["chat"] = Chat.objects.get(id=self.context["view"].kwargs.get("pk"))
+        attr["create_by"] = self.context.get("request").user
+        chat = attr.get("chat")
+        if chat.create_by in chat.with_who.blacklist.all() or chat.with_who in chat.create_by.blacklist.all() :
+            raise serializers.ValidationError("user have been blocked .")
+        return attr
     def to_representation(self,instance):
         context = super().to_representation(instance)
         context["create_time"] = instance.created.strftime("%H:%M:%S")
@@ -41,6 +43,11 @@ class ChatSerializer(serializers.ModelSerializer) :
         model = Chat
         fields = ["id","create_by","with_who","messages"]
         read_only_fields = ["create_by"]
+
+    def validate(self,attr):
+        if attr.get("with_who") in self.context.get("request").user.blacklist.all() :
+            raise serializers.ValidationError("user have been blocked .")
+        return attr
     def to_representation(self, instance):
         context = super().to_representation(instance)
         context["create_by"] = UserSerializer(instance.create_by).data

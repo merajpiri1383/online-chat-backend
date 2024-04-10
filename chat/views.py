@@ -16,8 +16,10 @@ from chat.serializer import MessageSerializer,ChatSerializer
 class ChatCreateAndListAPIView(ListCreateAPIView) :
     permission_classes = [IsAuthenticated]
     serializer_class = ChatSerializer
-    def get_queryset(self):
-        return self.request.user.chats_with.all().union(self.request.user.chats.all())
+    queryset = Chat.objects.all()
+    # def get_queryset(self) :
+    #     return self.request.user.chats_with.all().union(self.request.user.chats.all())
+
 # get chat and destroy
 class ChatAPIView(RetrieveDestroyAPIView) :
     queryset = Chat.objects.all()
