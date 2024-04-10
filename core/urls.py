@@ -14,5 +14,6 @@ urlpatterns = [
     path('chat/',include("chat.urls")),
     path("user/",include("user.urls")),
     path("group/",include("group.urls")),
+    path("profile/",include("profuser.urls")),
     re_path(r"^media/(?P<path>.*)$",serve,{"document_root":settings.MEDIA_ROOT}),
 ]
