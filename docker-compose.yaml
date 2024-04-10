@@ -1,0 +1,47 @@
+services :
+  online_chat_rabbitmq :
+    image : rabbitmq:management-alpine
+    ports :
+      - 5672:5672
+      - 15672:15672
+
+  online_chat_redis :
+    image : redis
+    ports :
+      - 6379:6379
+
+  online_chat_celery :
+    build :
+      context : ./
+      dockerfile : ./Dockerfile
+    restart: always
+    environment:
+      - DEBUG=True
+      - ALLOWED_HOSTS=127.0.0.1,localhost
+      - CELERY_BROKER_URL=amqp://guest:guest@online_chat_rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://online_chat_redis:6379/
+    command : celery -A core worker -l INFO -Q queue_1,queue_2
+    volumes:
+      - .:/codes
+    depends_on :
+      - online_chat_redis
+      - online_chat_rabbitmq
+
+  online_chat_django :
+    build :
+      context : ./
+      dockerfile : ./Dockerfile
+    environment:
+      - DEBUG=True
+      - ALLOWED_HOSTS=127.0.0.1,localhost
+      - CELERY_BROKER_URL=amqp://guest:guest@online_chat_rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://online_chat_redis:6379/
+    command : sh -c "python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports :
+      - 8000:8000
+    depends_on:
+      - online_chat_rabbitmq
+      - online_chat_celery
+      - online_chat_redis

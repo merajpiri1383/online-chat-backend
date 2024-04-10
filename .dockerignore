@@ -1,0 +1,13 @@
+# media files in django
+*/media
+
+# env for packages
+*/env
+
+# for caching data
+**/__pycache__/
+
+# for database
+*/*.sqlite3
+
+*/ .idea

@@ -4,11 +4,26 @@ from django.contrib.auth import get_user_model
 import sys
 from django.shortcuts import get_object_or_404
 from random import randint
+from sms_ir import SmsIr
+from django.conf import settings
+
+# config sms service
+sms_ir = SmsIr(
+    api_key=settings.SMS_API_KEY,
+    linenumber=settings.SMS_LINE_NUMBER
+)
 
 # send sms to user
 @shared_task(queue="queue_1")
 def send_sms(phone_number,otp_code) :
-    # sending email
+    # sending sms
+
+    sms_ir.send_sms(
+        phone_number,
+        f"کد ورود شما به کانکت {otp_code} می باشد ",
+        settings.SMS_LINE_NUMBER,
+    )
+
     sys.stdout.write(otp_code)
     return phone_number
 
@@ -26,6 +41,6 @@ def forget_password(phone):
     user.is_active = True
     # send sms
     sys.stdout.write(user.otp)
-    sleep(20)
+    sleep(120)
     user.save()
     sys.stdout.write(user)
