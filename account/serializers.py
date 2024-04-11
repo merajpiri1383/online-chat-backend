@@ -39,16 +39,16 @@ class RegisterSerialzier(serializers.ModelSerializer) :
 
 # reset password
 
-class ResetPassword(RegisterSerialzier) :
-    otp = serializers.SlugField(max_length=6,required=True)
+class ResetPasswordSerializer(serializers.ModelSerializer) :
+    confirm_password = serializers.SlugField(required=True, write_only=True)
     class Meta :
         model = get_user_model()
-        fields = ["phone","password","confirm_password","otp"]
-    def update(self, instance, validated_data):
-        if validated_data.get("otp") == instance.otp :
-            print("update")
-            instance.set_password(validated_data.get("password"))
-            instance.save()
-            return instance
-        else :
-            raise serializers.ValidationError({"detail":"invalid otp"})
+        fields = ["password","confirm_password"]
+    def update(self,instance,validated_data):
+        instance.set_password(validated_data.get("password"))
+        instance.save()
+        return instance
+    def validate(self, attrs):
+        if not password_regex.findall(attrs.get("password")) :
+            raise serializers.ValidationError("password must contains numbers and characters at least 8 ")
+        return attrs

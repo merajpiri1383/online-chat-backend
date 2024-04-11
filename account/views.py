@@ -6,7 +6,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 # jwt authentication
 # serializers for registerations
-from account.serializers import RegisterSerialzier,ResetPassword
+from account.serializers import RegisterSerialzier,ResetPasswordSerializer
 # documenting
 from drf_spectacular.utils import extend_schema,OpenApiParameter
 # tasks
@@ -15,6 +15,8 @@ from celery import chain
 # jwt tokens
 from user.serializer import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+# permissions 
+from rest_framework.permissions import IsAuthenticated
 
 
 # handling registeration for user
@@ -118,16 +120,11 @@ class ForegetPasswordAPIView(APIView) :
         forget_password.apply_async(args=[request.data.get("phone")])
         return Response(data={"detail":"code is sent ."})
 
-class ResetPasswordAPIView(APIView) :
+class ResetPasswordAPIView(APIView):
     def put(self,request):
-        try :
-            user = get_user_model().objects.get(phone=request.data.get("phone"))
-        except :
-            return Response(data={"detail":"user with this phone does not exist ."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        serializer = ResetPassword(data=request.data,instance=user)
-        if serializer.is_valid() :
-            serializer.save()
-            return Response(data=UserSerializer(user).data)
+        serialzier = ResetPasswordSerializer(data=request.data,instance=request.user)
+        if serialzier.is_valid() :
+            serialzier.save()
+            return Response(data={"detail":"password has been change successfully ."})
         else :
-            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=serialzier.errors,status=status.HTTP_400_BAD_REQUEST)

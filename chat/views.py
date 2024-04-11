@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.generics import (RetrieveDestroyAPIView,CreateAPIView,RetrieveUpdateDestroyAPIView,
                                      ListCreateAPIView)
 ## permissions
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from chat.permissions import IsInChat,IsInMessageOrNot
 # classes created for chat
 from chat.models import Chat , MessageChat
@@ -37,3 +37,5 @@ class MessageAPIView(RetrieveUpdateDestroyAPIView) :
     permission_classes = [IsInMessageOrNot]
     serializer_class = MessageSerializer
     queryset = MessageChat.objects.all()
+    
+    

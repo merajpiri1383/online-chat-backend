@@ -18,11 +18,11 @@ sms_ir = SmsIr(
 def send_sms(phone_number,otp_code) :
     # sending sms
 
-    sms_ir.send_sms(
-        phone_number,
-        f"کد ورود شما به کانکت {otp_code} می باشد ",
-        settings.SMS_LINE_NUMBER,
-    )
+    # sms_ir.send_sms(
+    #     phone_number,
+    #     f"کد ورود شما به کانکت {otp_code} می باشد ",
+    #     settings.SMS_LINE_NUMBER,
+    # )
 
     sys.stdout.write(otp_code)
     return phone_number
@@ -41,6 +41,13 @@ def forget_password(phone):
     user.is_active = True
     # send sms
     sys.stdout.write(user.otp)
+    # sending sms
+
+    # sms_ir.send_sms(
+    #     phone_number,
+    #     f"کد ورود شما به کانکت {otp_code} می باشد ",
+    #     settings.SMS_LINE_NUMBER,
+    # )
     sleep(120)
     user.save()
     sys.stdout.write(user)

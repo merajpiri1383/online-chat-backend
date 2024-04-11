@@ -61,7 +61,8 @@ MIDDLEWARE = [
 
 # cors headers settings
 
-CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS","http://127.0.0.1,http://localhost").split(",")
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS","http://127.0.0.1:3000,http://localhost:3000").split(",")
+
 
 
 
