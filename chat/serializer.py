@@ -17,7 +17,7 @@ class MessageSerializer(serializers.ModelSerializer) :
         attr["create_by"] = self.context.get("request").user
         chat = attr.get("chat")
         if chat.create_by in chat.with_who.blacklist.all() or chat.with_who in chat.create_by.blacklist.all() :
-            raise serializers.ValidationError("user have been blocked .")
+            raise serializers.ValidationError("شما توسط این کاربر مسدود شده اید")
         return attr
     def to_representation(self,instance):
         context = super().to_representation(instance)
@@ -46,7 +46,7 @@ class ChatSerializer(serializers.ModelSerializer) :
 
     def validate(self,attr):
         if attr.get("with_who") in self.context.get("request").user.blacklist.all() :
-            raise serializers.ValidationError("user have been blocked .")
+            raise serializers.ValidationError("شما توسط این کاربر مسدود شده اید")
         return attr
     def to_representation(self, instance):
         context = super().to_representation(instance)

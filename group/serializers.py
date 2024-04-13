@@ -33,10 +33,10 @@ class MessageGroupSerializer(serializers.ModelSerializer) :
     def validate(self,validated_data):
         user = self.context.get("request").user
         if not validated_data.get("text") and not validated_data.get("file") :
-            raise serializers.ValidationError("text or file is required .")
+            raise serializers.ValidationError("وارد کردن متن یا فایل ضروری می باشد")
         if validated_data.get("group") :
             if not user in validated_data.get("group").users.all() and user != validated_data.get("group").create_by:
-                raise serializers.ValidationError("this user is not in this group .")
+                raise serializers.ValidationError("شما در این گروه نمی باشد")
         return validated_data
 
 class GroupSerializer(serializers.ModelSerializer) :

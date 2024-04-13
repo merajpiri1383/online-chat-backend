@@ -26,11 +26,11 @@ class UserGroupAPIView(APIView) :
 
     def get_user(self):
         if not self.request.data.get("phone") :
-            return Response(data={"detail":"phone is required"})
+            return Response(data={"detail":"شماره ضروری می باشد"})
         try :
             self.user = get_user_model().objects.get(phone=self.request.data["phone"])
         except :
-            return Response(data={"detail":"user not found"},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":"کاربری با این شماره وجود ندارد"},status=status.HTTP_400_BAD_REQUEST)
     def get_group(self):
         if not self.request.data.get("group") :
             return Response(data={"detail":"group is required ."},status=status.HTTP_400_BAD_REQUEST)

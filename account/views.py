@@ -34,7 +34,7 @@ class RegisterAPIView(APIView) :
             # send activation code using celery and rabbitmq
             # check that if user not activate after 120s user delete
             tasks = chain(send_sms.s(user.phone,user.otp),delete_user.s())()
-            return Response(data={"detail":f"activation code is sent "})
+            return Response(data={"detail":f"کد تایید ارسال شد"})
         return Response(
             data=serializer.errors ,
             status = status.HTTP_400_BAD_REQUEST
@@ -52,11 +52,11 @@ class VerifyAPIView(APIView) :
     )
     def post(self,request):
         if not request.data.get("phone") :
-            return Response(data={"detail":"phone number is required"},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":"شماره ضروری می باشد"},status=status.HTTP_400_BAD_REQUEST)
         try :
             user = get_user_model().objects.get(phone=request.data.get("phone"))
         except :
-            return Response(data={"detail":"user with this phone doesnt exist "},
+            return Response(data={"detail":"کاربری با این شماره وجود ندارد"},
                             status=status.HTTP_400_BAD_REQUEST)
         if request.data.get("otp") == user.otp :
             user.is_active = True
@@ -84,15 +84,15 @@ class LoginAPIView(APIView) :
     def post(self,request):
         # check phone and password is exist
         if not request.data.get("phone") :
-            return Response(data={"detail":"phone is required ."},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":"شماره ضروری می باشد"},status=status.HTTP_400_BAD_REQUEST)
         if not request.data.get("password") :
-            return Response(data={"detail":"password is required ."},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":"رمز عبور ضروری می باشد"},status=status.HTTP_400_BAD_REQUEST)
 
         # check user exist
         try :
             user = get_user_model().objects.get(phone=request.data.get("phone"),is_active=True)
         except :
-            return Response(data={"detail":"user doesnt exist ."},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":"کاربری با این شماره وجود ندارد "},status=status.HTTP_400_BAD_REQUEST)
         if user.check_password(request.data.get("password")) :
             token = RefreshToken.for_user(user)
             return Response(data={
@@ -101,7 +101,7 @@ class LoginAPIView(APIView) :
                 "refresh_token" : str(token),
             })
         else :
-            return Response(data={"detail":"password or phone is incorrect ."},
+            return Response(data={"detail":"شماره یا رمز عبور اشتباه می باشد"},
                             status=status.HTTP_400_BAD_REQUEST)
 
 # forget password and send otp code for reseting
@@ -115,16 +115,16 @@ class ForegetPasswordAPIView(APIView) :
     def post(self,request):
         # check phone is passed
         if not request.data.get("phone") :
-            return Response(data={"detail":"phone is required ."} , status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":"شماره ضروری می باشد"} , status=status.HTTP_400_BAD_REQUEST)
         # send otp to user
         forget_password.apply_async(args=[request.data.get("phone")])
-        return Response(data={"detail":"code is sent ."})
+        return Response(data={"detail":"کد تایید ارسال شد"})
 
 class ResetPasswordAPIView(APIView):
     def put(self,request):
         serialzier = ResetPasswordSerializer(data=request.data,instance=request.user)
         if serialzier.is_valid() :
             serialzier.save()
-            return Response(data={"detail":"password has been change successfully ."})
+            return Response(data={"detail":"رمز عبور با موفقیت تغییر کرد"})
         else :
             return Response(data=serialzier.errors,status=status.HTTP_400_BAD_REQUEST)

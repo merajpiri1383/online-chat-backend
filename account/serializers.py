@@ -24,17 +24,17 @@ class RegisterSerialzier(serializers.ModelSerializer) :
     def validate(self,validated_data):
         # phone field
         if len(validated_data.get("phone")) != 11 :
-            raise serializers.ValidationError("phone number must be 11 character .")
+            raise serializers.ValidationError("شماره باید ۱۱ رقم باشد ")
 
         if not validated_data.get("phone").isdigit() :
-            raise serializers.ValidationError("phone number must be integer .")
+            raise serializers.ValidationError("شماره عدد نیست ")
 
         # password fields
         if validated_data.get("password") != validated_data.get("confirm_password") :
-            raise serializers.ValidationError("password and confrim arnt match .")
+            raise serializers.ValidationError("رمز عبور و تکرار رمز عبور یکسان نمی باشد ")
 
         if not password_regex.findall(validated_data.get("password")) :
-            raise serializers.ValidationError("password must contains numbers and characters at least 8 ")
+            raise serializers.ValidationError("رمز عبور باید حداقل ۸ عدد و حروف باشد ")
         return validated_data
 
 # reset password
@@ -50,5 +50,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer) :
         return instance
     def validate(self, attrs):
         if not password_regex.findall(attrs.get("password")) :
-            raise serializers.ValidationError("password must contains numbers and characters at least 8 ")
+            raise serializers.ValidationError("رمز عبور باید حداقل ۸ عدد و حروف باشد")
+        if attrs.get("password") != attrs.get("confirm_password") : 
+            raise serializers.ValidationError("رمز عبور و تکرار رمز عبور یکسان نمی باشد ")
         return attrs

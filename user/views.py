@@ -14,12 +14,12 @@ from rest_framework.permissions import IsAuthenticated
 def get_user(request):
     # check phone is passd ?
     if not request.data.get("phone"):
-        return Response({"detail": "phone is required ."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "شماره ضروری می باشد"}, status=status.HTTP_400_BAD_REQUEST)
     # check phone is valid
     try:
         return get_user_model().objects.get(phone=request.data.get("phone"))
     except:
-        return Response(data={"detail": "user not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(data={"detail": "کاربری با این شماره وجود ندارد"}, status=status.HTTP_404_NOT_FOUND)
 class ListUserAPIView(ListAPIView) :
     queryset = get_user_model().objects.filter(is_superuser=False)
     serializer_class = UserSerializer
