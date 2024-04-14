@@ -56,7 +56,7 @@ class ContactAPIView(APIView) :
         result = get_user(request)
         if not isinstance(result, get_user_model()):
             return result
-        request.user.contacts.add(user)
+        request.user.contacts.add(result)
         return Response(data=MoreInfoUserSerializer(request.user).data)
     def delete(self,request):
         result = get_user(request)

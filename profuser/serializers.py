@@ -4,8 +4,4 @@ from profuser.models import Profile
 class ProfileSerializer(serializers.ModelSerializer) :
     class Meta :
         model = Profile
-        fields =["id","username","image","email"]
-    def to_representation(self, instance):
-        context = super().to_representation(instance)
-        context["phone"] = instance.user.phone
-        return context
+        fields =["username","image","email"]

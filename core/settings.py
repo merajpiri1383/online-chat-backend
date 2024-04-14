@@ -103,7 +103,7 @@ TEMPLATES = [
 # jwt authentication settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME" : timedelta(minutes=10),
-    "REFRESH_TOKEN_LIFETIME" : timedelta(minutes=20)
+    "REFRESH_TOKEN_LIFETIME" : timedelta(days=7)
 }
 
 WSGI_APPLICATION = 'core.wsgi.application'
