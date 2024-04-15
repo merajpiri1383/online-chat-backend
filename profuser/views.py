@@ -15,10 +15,10 @@ class ProfileAPIView(APIView) :
     permission_classes = [IsAuthenticated,IsOwnerOrReadOnly]
     serializer_class = ProfileSerializer
     def get(self,request):
-        serializer = MoreInfoUserSerializer(instance=request.user)
+        serializer = MoreInfoUserSerializer(instance=request.user,context={"request":request})
         return Response(data=serializer.data)
     def put(self,request):
-        serializer = ProfileSerializer(data=request.data,instance=request.user.profile)
+        serializer = ProfileSerializer(data=request.data,instance=request.user.profile,context={"request":request})
         if serializer.is_valid() :
             serializer.save()
             return Response(data=serializer.data)

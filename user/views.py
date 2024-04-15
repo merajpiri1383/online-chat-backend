@@ -50,7 +50,7 @@ class ContactAPIView(APIView) :
     permission_classes = [IsAuthenticated]
 
     def get(self,request):
-        serializer = UserSerializer(request.user.contacts.all(),many=True)
+        serializer = MoreInfoUserSerializer(request.user)
         return Response(data=serializer.data)
     def post(self,request):
         result = get_user(request)
