@@ -44,7 +44,7 @@ class GroupSerializer(serializers.ModelSerializer) :
     messages = MessageGroupSerializer(many=True,read_only=True)
     class Meta :
         model = Group
-        fields = ["id","name","create_by","messages"]
+        fields = ["id","name","image","create_by","messages"]
         read_only_fields = ["create_by","messages"]
 
     def create(self,validated_data):

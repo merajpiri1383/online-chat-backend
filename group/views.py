@@ -16,7 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 class GroupListCreateAPIView(ListCreateAPIView) :
     serializer_class = GroupSerializer
     def get_queryset(self):
-        return self.request.user.group_chats.all()
+        return self.request.user.group_chats.all().union(self.request.user.group_set.all())
     permission_classes = [IsAuthenticated]
 
 
@@ -46,7 +46,7 @@ class UserGroupAPIView(APIView) :
             return self.get_user()
         self.check_object_permissions(self.request, self.group)
         self.group.users.add(self.user)
-        return Response(data=GroupSerializer(self.group).data)
+        return Response(data=GroupSerializer(self.group,context={"request":request}).data)
     def delete(self,request):
         if self.get_group() :
             return self.get_group()
@@ -54,7 +54,7 @@ class UserGroupAPIView(APIView) :
             return self.get_user()
         self.check_object_permissions(self.request, self.group)
         self.group.users.remove(self.user)
-        return Response(data=GroupSerializer(self.group).data)
+        return Response(data=GroupSerializer(self.group,context={"request":request}).data)
 
 # get update and delete group
 class GroupAPIView(RetrieveUpdateDestroyAPIView) :

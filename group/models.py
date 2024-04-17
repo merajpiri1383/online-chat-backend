@@ -5,6 +5,7 @@ from chat.models import Message
 
 class Group(models.Model) :
     name = models.CharField(max_length=128,unique=True)
+    image = models.ImageField(upload_to="groups/images")
     create_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name="group_chats")
     created = jDateTimeField(auto_now_add=True)
     users = models.ManyToManyField(get_user_model())
