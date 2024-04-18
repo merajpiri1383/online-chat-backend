@@ -9,6 +9,8 @@ class IsOwnerGroupOrInGroupReadOnly(BasePermission) :
     def has_object_permission(self,request,view,object):
         if request.user.is_authenticated :
             user = request.user
+            if request.method == "DELETE" and request.data.get("phone") == user.phone :
+                return True
             if request.method in SAFE_METHODS :
                 return user in object.users.all() or user == object.create_by
             else :
