@@ -25,3 +25,4 @@ class IsOwnerMessageOrReadOnly(BasePermission) :
                 return request.user in obj.group.users.all() or request.user == obj.create_by
             else :
                 return obj.create_by == request.user
+

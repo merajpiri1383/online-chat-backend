@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import (RetrieveDestroyAPIView,CreateAPIView,RetrieveUpdateDestroyAPIView,
                                      ListCreateAPIView)
+from rest_framework import status
 ## permissions
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from chat.permissions import IsInChat,IsInMessageOrNot
@@ -19,12 +20,29 @@ class ChatCreateAndListAPIView(ListCreateAPIView) :
     def get_queryset(self):
         return self.request.user.chats.all().union(self.request.user.chats_with.all())
 
+
 # get chat and destroy
 
 class ChatAPIView(RetrieveDestroyAPIView) :
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated,IsInChat]
+
+# getting chat messages and read them
+class ReadMessageAPIView(APIView) :
+    permission_classes = [IsAuthenticated, IsInChat]
+    def get(self,request,pk):
+        # getting chat
+        try :
+            chat = Chat.objects.get(id=pk)
+            self.check_object_permissions(request,chat)
+        except :
+            return Response(data={"detail":"chat with this id does not exist"},status=status.HTTP_400_BAD_REQUEST)
+        for message in chat.messages.all() :
+            if not request.user in message.readers() :
+                message.users_read.add(request.user)
+        return Response(data=ChatSerializer(chat,context={"request":request}).data)
+
 
 # create new message
 class CreateMessageAPIView(CreateAPIView) :

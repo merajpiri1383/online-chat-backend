@@ -12,4 +12,6 @@ urlpatterns = [
     path("message/create/",views.CreateMessageGroupAPIView.as_view()),
     # get , update , destroy message
     path("message/<pk>/",views.MessageGroupAPIView.as_view()),
+    # read messages in group
+    path("<pk>/messages/read/",views.ReadMessagesGroupAPIView.as_view()),
 ]

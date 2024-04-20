@@ -1,4 +1,6 @@
 import os
+
+from charset_normalizer import CharsetMatches
 # config for .env file
 from dotenv import load_dotenv
 from datetime import timedelta
@@ -172,3 +174,14 @@ MEDIA_ROOT = BASE_DIR /"media"
 # sms.ir
 SMS_API_KEY = os.getenv("SMS_API_KEY")
 SMS_LINE_NUMBER = os.getenv("SMS_LINE_NUMBER")
+
+# caching
+CACHES = {
+    "default": {
+        "BACKEND" : "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION" : "127.0.0.1:11211",
+    }
+}
+
+USER_ONLINE_TIMEOUT = 300
+USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7

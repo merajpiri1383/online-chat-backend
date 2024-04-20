@@ -58,4 +58,10 @@ class GroupSerializer(serializers.ModelSerializer) :
         context["create_time"] = instance.created.strftime("%H:%M:%S")
         context["create_date"] = instance.created.strftime("%Y-%m-%d")
         context["users"] = UserSerializer(instance.users,many=True).data
+        # un read messages
+        un_read_messages = []
+        for message in instance.messages.all() :
+            if not self.context.get("request").user in message.readers() :
+                un_read_messages.append(message)
+        context["un_read_messages"] = MessageGroupSerializer(un_read_messages,many=True).data
         return context

@@ -30,12 +30,6 @@ class MessageSerializer(serializers.ModelSerializer) :
 
 class ChatSerializer(serializers.ModelSerializer) :
     messages = MessageSerializer(many=True,read_only=True)
-    # if this user has a chat with another user create method just get that chat and give you
-    # with_who = serializers.PrimaryKeyRelatedField(
-    #     required=True,
-    #     queryset=get_user_model().objects.all()
-    # )
-
 
     class Meta :
         model = Chat
@@ -62,8 +56,16 @@ class ChatSerializer(serializers.ModelSerializer) :
         return chat
 
     def to_representation(self, instance):
+
+        # un read messages
+        un_read_messages = []
+
         context = super().to_representation(instance)
-        # context["messages"] = MessageSerializer(instance.messages,many=True).data
+        context["messages"] = MessageSerializer(instance.messages,many=True).data
         context["create_by"] = UserSerializer(instance.create_by,context={"request":self.context["request"]}).data
         context["with_who"] = UserSerializer(instance.with_who,context={"request":self.context["request"]}).data
+        for message in instance.messages.all() :
+            if not self.context.get("request").user in  message.readers() :
+                un_read_messages.append(message)
+        context["un_read_messages"] = MessageSerializer(un_read_messages,many=True).data
         return context

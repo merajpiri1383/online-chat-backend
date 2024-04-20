@@ -72,3 +72,19 @@ class MessageGroupAPIView(RetrieveUpdateDestroyAPIView) :
     permission_classes = [IsAuthenticated,IsOwnerMessageOrReadOnly]
     serializer_class = MessageGroupSerializer
     queryset = MessageGroup.objects.all()
+
+# read messages in group
+class ReadMessagesGroupAPIView(APIView) :
+
+    permission_classes = [IsAuthenticated,IsOwnerGroupOrInGroupReadOnly]
+    def get(self,request,pk):
+
+        # getting the group
+        try :
+            group = Group.objects.get(id=pk)
+        except :
+            return Response(data={"detail":"group with this id does not exist"},status=status.HTTP_400_BAD_REQUEST)
+        for message in group.messages.all() :
+            if request.user not in message.readers() :
+                message.users_read.add(request.user)
+        return Response(data=GroupSerializer(group,context={"request":request}).data)

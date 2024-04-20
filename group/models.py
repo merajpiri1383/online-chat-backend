@@ -15,11 +15,6 @@ class Group(models.Model) :
 
 class MessageGroup(Message) :
     group = models.ForeignKey(Group,on_delete=models.CASCADE,related_name="messages")
-    sub_message = models.ForeignKey(
-        "MessageGroup",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    users_read = models.ManyToManyField(get_user_model(), related_name="users_read_group")
     def __str__(self):
         return f"Message Group : {self.group.name}"
