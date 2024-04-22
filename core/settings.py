@@ -29,6 +29,14 @@ AUTH_USER_MODEL = "user.User"
 # Application definition
 
 INSTALLED_APPS = [
+    # external apps
+    'channels',
+    'rest_framework',
+    'drf_spectacular',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,12 +50,8 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'group.apps.GroupConfig',
     'profuser.apps.ProfuserConfig',
+    'channel.apps.ChannelConfig',
 
-    # external apps
-    'rest_framework',
-    'drf_spectacular',
-    'rest_framework_simplejwt',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +69,18 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS","http://127.0.0.1:3000,http://localhost:3000").split(",")
 
+# channel layers 
 
+
+ASGI_APPLICATION = "core.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 
 # rest framework settings
