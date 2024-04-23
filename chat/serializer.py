@@ -29,8 +29,8 @@ class MessageSerializer(serializers.ModelSerializer) :
         return context
 
 class ChatSerializer(serializers.ModelSerializer) :
-    messages = MessageSerializer(many=True,read_only=True)
-
+    
+    messages = MessageSerializer(read_only=True,many=True)
     class Meta :
         model = Chat
         fields = ["id","create_by","with_who","messages"]
@@ -61,11 +61,11 @@ class ChatSerializer(serializers.ModelSerializer) :
         un_read_messages = []
 
         context = super().to_representation(instance)
-        context["messages"] = MessageSerializer(instance.messages,many=True).data
+        context["messages"] = MessageSerializer(instance.messages,many=True,context={"request":self.context["request"]}).data
         context["create_by"] = UserSerializer(instance.create_by,context={"request":self.context["request"]}).data
         context["with_who"] = UserSerializer(instance.with_who,context={"request":self.context["request"]}).data
         for message in instance.messages.all() :
             if not self.context.get("request").user in  message.readers() :
                 un_read_messages.append(message)
-        context["un_read_messages"] = MessageSerializer(un_read_messages,many=True).data
+        context["un_read_messages"] = MessageSerializer(un_read_messages,many=True,context={"request":self.context["request"]}).data
         return context
